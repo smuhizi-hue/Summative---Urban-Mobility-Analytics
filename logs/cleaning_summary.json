@@ -1,0 +1,31 @@
+{
+  "rows_raw": 7696617,
+  "rows_excluded": 261509,
+  "rows_clean": 7435108,
+  "percent_kept": 96.6,
+  "excluded_by_reason": {
+    "missing_required_values": 0,
+    "pickup_outside_january_2019": 537,
+    "dropoff_not_after_pickup": 6554,
+    "trip_shorter_than_min": 67781,
+    "trip_longer_than_max": 20843,
+    "distance_too_short": 15975,
+    "distance_too_long": 23,
+    "negative_money_value": 4020,
+    "fare_too_low": 1051,
+    "fare_too_high": 1,
+    "fare_per_mile_too_high": 1588,
+    "tip_too_high": 11,
+    "tolls_too_high": 16,
+    "passenger_count_invalid": 114729,
+    "rate_code_invalid": 27966,
+    "zone_id_not_in_lookup": 0,
+    "speed_impossible": 411,
+    "duplicate_trip": 3
+  },
+  "suspicious_rows_kept": 15624,
+  "median_trip_minutes": 10.23,
+  "median_trip_miles": 1.56,
+  "median_fare_per_mile": 5.5,
+  "median_tip_percent_credit_card": 22.22
+}

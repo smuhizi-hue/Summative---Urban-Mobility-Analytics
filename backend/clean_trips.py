@@ -18,7 +18,7 @@ def rename_columns(trips):
         "tpep_dropoff_datetime" : "dropoff_time",
         "RatecodeID" : "rate_code_id",
         "PULocationID" : "pickup_zone_id",
-        "DOLocation" : "dropoff_zone_id",
+        "DOLocationID" : "dropoff_zone_id",
     })
     return trips
 
@@ -41,6 +41,7 @@ def mark(trips, reason, has_problem):
 
     not_marked_yet = trips["exclusion_code"] == 0
     newly_bad = has_problem & not_marked_yet
+    trips.loc[newly_bad, "exclusion_code"] = rule_number
 
     reason_counts[reason] = int(newly_bad.sum())
     print(f" {reason:35s} {reason_counts[reason]:>9,} rows")
@@ -87,7 +88,7 @@ def apply_rules(trips, zones):
          config.MAX_FARE_PER_MILE)
     mark(trips, "tip_too_high",
          trips["tip_amount"] > config.MAX_TIP)
-    mark(trips,
+    mark(trips, "tolls_too_high",
          trips["tolls_amount"] > config.MAX_TOLLS)
 
     # more invalid values
@@ -122,9 +123,9 @@ def standardise(trips):
 
 def add_features(trips, zones):
 
-    trips["fare_per_mile"] = (trips["tare_amount"] / trips["trip_distance"]).round(2)
+    trips["fare_per_mile"] = (trips["fare_amount"] / trips["trip_distance"].replace(0, float("nan"))).round(2)
 
-    trips["tip_percent"] = (trips["tip_amount"] / trips["fare_amount"] * 100).round(2)
+    trips["tip_percent"] = (trips["tip_amount"] / trips["fare_amount"].replace(0, float("nan")) * 100).round(2)
     not_credit_card = trips["payment_type"] != 1
     trips.loc[not_credit_card, "tip_percent"] = None
 
