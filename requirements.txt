@@ -1,0 +1,6 @@
+flask
+pandas
+pyarrow
+pyproj
+pymysql
+cryptography
