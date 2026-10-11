@@ -39,7 +39,9 @@ def mark(trips, reason, has_problem):
     reason_names.append(reason)
     rule_number = len(reason_names)
 
-    not_marked_yet = trips["exclusion_code"] = rule_number
+    not_marked_yet = trips["exclusion_code"] == 0
+    newly_bad = has_problem & not_marked_yet
+
     reason_counts[reason] = int(newly_bad.sum())
     print(f" {reason:35s} {reason_counts[reason]:>9,} rows")
 
@@ -134,11 +136,12 @@ def add_features(trips, zones):
     # using the zone table to look up borough names and airports
     borough_of_zone = dict(zip(zones["zone_id"], zones["borough"]))
     pickup_borough = trips["pickup_zone_id"].map(borough_of_zone)
+    dropoff_borough = trips["dropoff_zone_id"].map(borough_of_zone)
 
     #cross_borough
     trips["is_cross_borough"] = pickup_borough != dropoff_borough
 
-    # is_airport_trip = True if it starts or stops at an airport
+    # is_airport_trip = True if it starts or stops at an airports
     airport_zones = zones[zones["zone_name"].str.contains("Airport")]
     airport_ids = list(airport_zones["zone_id"])
     trips["is_airport_trip"] = (trips["pickup_zone_id"].isin(airport_ids)) | trips["dropoff_zone_id"].isin(airport_ids)
