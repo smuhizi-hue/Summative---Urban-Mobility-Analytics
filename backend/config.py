@@ -57,8 +57,8 @@ VENDORS = {
 
 DB_HOST = os.environ.get("DB_HOST", "localhost")
 DB_PORT = int(os.environ.get("DB_PORT", "3306"))
-DB_USER = "root"
-DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
-DB_NAME = os.environ.get("DB_NAME", "nyc_taxi_full")
-SCHEMA_FILE = os.path.join(BASE_DIR, "database", "schema_full.sql")
-INDEXES_FILE = os.path.join(BASE_DIR, "database", "indexes_full.sql")
+DB_USER = "mobility_user"
+DB_PASSWORD = "TaxiTest2026!"
+DB_NAME = os.environ.get("DB_NAME", "nyc_taxi")
+SCHEMA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "database", "schema.sql")
+INDEXES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "database", "indexes.sql")

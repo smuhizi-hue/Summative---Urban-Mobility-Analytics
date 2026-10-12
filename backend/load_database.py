@@ -15,32 +15,39 @@ TRIP_COLUMNS = [
 ]
 
 def run_sql_file(connection, path):
-    with open(path,) as file:
-        text = file.read()
-    with connection.cursor() as cursor:
-        for statement in statements:
-            if statement.strip():
-                cursor.execute(statement)
+    with open(path, encoding="utf-8") as file:
+        sql = file.read()
+   
+   
+    statement = sql.split(";")
+    cursor = connection.cursor()
+    
+    
+    for statement in statement:
+        if statement.strip():
+            cursor.execute(statement)
     connection.commit()
+    cursor.close()
 
 def fill_lookup_tables(connection):
-    zones = pd.read_csv(config.CLEANS_ZONES_FILE)
+    zones = pd.read_csv(config.CLEAN_ZONES_FILE)
     cursor = connection.cursor()
 
     boroughs_names = sorted(zones["borough"].unique())
     for name in boroughs_names:
-        cursor.execute("INSERT INTO boroughs (boroughs_name) VALUES (%s)", (name,))
-    cursor.execute("SELECT borough_id, boroughs_name FROM boroughs")
+        cursor.execute("INSERT INTO boroughs (borough_name) VALUES (%s)", (name,))
+    cursor.execute("SELECT borough_id, borough_name FROM boroughs")
     boroughs_id_of = {}
     for borough_id, boroughs_name in cursor.fetchall():
         boroughs_id_of[boroughs_name] = borough_id
 
-    for _, row in zones.iterows():
+    for _, row in zones.iterrows():
         lat = None if  pd.isna(row["center_lat"]) else float(row["center_lat"])
         lon = None if pd.isna(row["center_lon"]) else float(row["center_lon"])
         cursor.execute(
-            "INSERT INTO zones VALUES (%s, %s, %s, %s, %s)",
-            (int(row["zone_id"]), row["zone_name"], boroughs_id_of[row["borough"]], row["service_zone"], lat, lon, bool(row["has_boundary"])))
+            "INSERT INTO zones VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            (int(row["zone_id"]), row["zone_name"], boroughs_id_of[row["borough"]], row["service_zone"], lat, lon, bool(row["has_boundary"]))
+            )
     
 
     for vendor_id, name in config.VENDORS.items():
@@ -48,15 +55,15 @@ def fill_lookup_tables(connection):
     for code, name in config.PAYMENT_TYPES.items():
         cursor.execute("INSERT INTO payment_types VALUES (%s, %s)", (code, name))
     for code, name in config.RATE_CODES.items():
-        cursor.execute("INSERT INTO rate_codes_VaLUES" " (%s, %s)", (code, name))
+        cursor.execute("INSERT INTO rate_codes VaLUES (%s, %s)", (code, name))
     connection.commit()
     print("Lookup tables filled.")
 
 def insert_trips(connection):
-    parquet_file = pq.ParquetFile(config.CLEANS_TRIPS_FILE)
+    parquet_file = pq.ParquetFile(config.CLEAN_TRIPS_FILE)
     total = parquet_file.metadata.numrows
 
-    sql = "INSERT INTO trips ("+ ",".join(TRIP_COLUMNS) + ") VALUES (" + ", ".join(["%S"] * len(TRIP_COLUMNS)) + ")"
+    sql = "INSERT INTO trips ("+ ",".join(TRIP_COLUMNS) + ") VALUES (" + ", ".join(["%s"] * len(TRIP_COLUMNS)) + ")"
     cursor = connection.cursor()
     cursor.execute("SET FOREIGN_KEY_CHECKS=0") # the data is already checked, so this is faster
     cursor.execute("SET UNIQUE_CHEKS = 0")
