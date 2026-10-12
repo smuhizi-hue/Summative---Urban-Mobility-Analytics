@@ -57,6 +57,7 @@ VENDORS = {
 
 DB_HOST = os.environ.get("DB_HOST", "localhost")
 DB_PORT = int(os.environ.get("DB_PORT", "3306"))
+DB_USER = "root"
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
 DB_NAME = os.environ.get("DB_NAME", "nyc_taxi_full")
 SCHEMA_FILE = os.path.join(BASE_DIR, "database", "schema_full.sql")
