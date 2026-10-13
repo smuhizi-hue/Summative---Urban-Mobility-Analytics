@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+<title> NYC Urban Mobility Exlorer</title>
+
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+
+<body>
+
+
+    <! -- ==== Header ==== -->
+<header>
+ <div>
+<h1>  NYC Urban Mobility Explorer</h1>  
+<p>HOw does NEW YORK City mive? Yellow taxi trips, January 2019<p>
+</div>
+
+
+<divn id="story-card" onclick="applystory('rush')">
+<h3>1 . Two different cities</h3>
+<p>
+    On weekdays the peak id the evening rush (6 pm).
+    On weekends <b>14.5%</b> of trips happen between midnight and 4 am, only<b>4.7%</b> on weekdays.
+</p> 
+<span> Click to compare = </span>
+</div>
+
+
+</div class="story-card" onclick="applystory"('airport')>
+<h3>3 . Airport trips are gold</h3>
+<p>
+    Only <b>6.4%</b> of trips go to or from an airport,
+    but the average fare is <b>$39.65</b> versus <b>$10.28</b>, and they bring <b>20.8%</b> of all fare revenue.
+</p>
+<span>click to filter airport trips = </span>
+</div>
+
+
+</section>
+
+<section class="panel filters">
+<h2> Filters</h2>
+
+<div class="filter-grid">
+
+    <label>
+      From date 
+      <input type="date" id=" f-start">
+   </label>
+
+<label>
+    Pickup borough
+    <select id="f-borough">
+      <option value="">All</option>
+     </select>
+   </labell>
+
+    <label>
+        Payment
+     <select id="f-payment">
+        <option value="">All</option>
+    </select>
+</label>
+
+</label>
+    Day type
+    <select id="f-daytype">
+        <option value="">All days</option>
+        <option value="">weekdays</option>
+        <option value="">weekends</option>
+    </select>
+</label>
+
+</label>
+   Hour from (0-23)
+   <input type="number" id="f-hour-from" min="0" max="23" placeholder="0"> 
+</label>
+
+</label>
+Hour to (0-23)
+<input type="number" id="f-hour-to" min="0" step="0.5">
+</label>
+
+</label>
+    Min distance (mi)
+    <input type="number" id="f-min-distance" min="0" step="0.5">
+</label>
+
+</label>
+    Max distance(mi)
+    <input type="number" id="f-max-distance"
+            min="0" step="0.5">
+</label>
+
+</label>
+    Min fare ($)
+    <input type="number"id="f-min-fare" min="0">
+</label>
+
+</label>
+    Max fare ($)
+    <input type="number" id="f-max-fare" min="0">
+</label>
+
+<label class="check">
+    <input type="checkbox" id="f-suspicious">
+    Hide suspicious records
+</label>
+
+</div>
+
+<div class="filter-buttons">
+    <button id="btn-apply">Apply filters</button>
+    <button id="btn-reset" class="secondary">Reset</button>
+    <span id="zone-chip" class="chip hidden"></span>
+    <span id="loading" class="hidden"> Loanding...</span>
+   </div>
+  </section>  
+<section class="kpis">
+
+
+<div class="kpi">
+    <span id="kpi-trips">-</span>
+    <small>Trips</small>
+</div>
+
+<div class="kpi">
+    <span id="kpi-fare">-</span>
+    <small>Average fare</small>
+</div>
+
+    <span id="kpi-minutes">-</span>
+<small>Average duration</small>
+</div>
+
+<div class="kpi">
+    <span id="kpi-speed">-</span>
+    <small>Average speed</small>
+</div>
+
+    <span id="kpi-distance">-</span>
+    <small>Average distance</small>
+</div>
+
+    <div class="kpi">
+        <span id="kpi-tip">-<span>
+        <small>Tip (creditcard)</small>
+    </div>
+
+</section>
+
+<section class="row two">
+
+    <div class="panel">
+        <h2>when do people ride?</h2>
+        <p class="hint">
+            Share of all trips in each hour of the day
+            (each line adds up to 100%)
+        </p>
+        <div class="chart-box">
+            <canvas id="chart-hourly"></canvas>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2> How fast is traffic?</h2>
+        <p class="hint">
+            Average taxi speed (mph) by hour of pickup - lower means more congestion
+            </p>
+            <div class="chart-box">
+                <canvas id="chart-speed"></canvas>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="row map-row">
+
+            <div class="panel">
+                <h2> Where does it happen?</h2>
+
+                <div class="map-controls">
+                    <label>
+                        colour the map by
+                        <select id="metric">
+                            <option value="pickups">Number of pickups</option>
+                            <option value="avg_fare">Average fare ($)</option>
+                            <option value="tip_percent">Tip % (credit card)</option>
+                            <option value="avg_speed">Average speed (mph)</option>
+                            <option value="avg_distance">Average distance (mi)</option>
+                            </select>
+                        </label>
+
+                        <span class="hint">
+                            click a zone to filter everything by it.
+                            </span>
+                        </div>
+
+                        <div id="map"></div>
+                        <div id="legend" class="hint"></div>
+                    </div>
+
+                    <div class="panel">
+                        <h2> Top 10 zones</h2>
+                        <p class="hint">
+                            Ranked by our own merge sort
+                            ( zones with at least 200 pickups)
+                        </p>
+                        <ol id="top-zones" class="top-list"></ol>
+                        </div>
+
+                        </section>
+
+                        <section class="row two">
+
+                            <div class="panel">
+                                <h2>Trips per day</h2>
+                                <div class="chart-box">
+                                    <canvas id="chart-daily"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="panel">
+                                <h2>How do people pay?</h2>
+                                <div class="chart-box">
+                                    <canvas id="chart-payments"></canvas>
+                                </div>
+                            </div>
+
+                            </section>
+
+                            <section class="panel">
+                                <h2>Most popular routes</h2>
+                                <p class="hint">
+                                    "Unknwon" means the taxi meter didi not record a zone.
+                                    </p>
+
+                                    <table id="routes-table">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>From</th>
+                                                <th>To</th>
+                                                <th>Trips</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                        </table>
+                                        </section>
+<!-- ==== Trip details ==== -->
+                                        <section class="panel">
+                                            <h2>
+
+                                                <small id="trips-total"></small>
+                                                </h2>
+
+                                                <p class="hint">Click a coloumn title to sort.</p>
+
+                                                <div class="table-scroll">
+                                                    <table id="trips-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th data-sort="pickup_time">Pickup time</th>
+                                                                <th>From</th>
+                                                                <th>To</th>
+                                                                <th data-sort="trip-distance">Distance (mi)</th>
+                                                                <th data-sort="trip_duration_min"></th>Minutes</th>
+                                                                <th data-sort="avg_speed_mph">Speed (mph)</th>
+                                                                <th data-sort="fare_amount">Fare</th>
+                                                                <th data-sort="tip_amount">Tip</th>
+                                                                <th data-sort="total_amount">Total</th>
+                                                                <th>Payment</th>
+                                                            </tr>
+                                                        </thead> 
+                                                        <tbody></tbody>
+                                                        </table>
+                                                    </div>
+
+                                                    <div class="pager">
+                                                        <button id="btn-prev" class="secondary">Previous</button>
+                                                        <span id="page-info"></span>
+                                                        <button id="btn-next" class="secondary">Next</button>
+                                                    </div>
+                                                </section>
+
+<!--====Data quality ====-->>
+                                                <section class="panel">
+                                                    <h2>Data quality: what we removed and why</h2>
+                                                    <p class="hint" id="quality-text"></p>
+
+                                                    <div class="chart-box tall">
+                                                        <canvas id="chart-quality"></canvas>
+                                                        </div>
+                                                        </section>
+                                                        
+                                                        <footer>
+                                                            Data: NYC Taxi &amp; Limousine commissionm January 2019
+                                                            . Built with Flask, MYSQL, Chart.js and Leaflet
+                                                            </footer>
+
+                                                            <script src="vendor/chart.umd.js"></script>
+                                                            <script src="vendor/leaflet.js"></script>
+                                                            <script src="js/main.js"></script>
+                                                        </body>
+                                                        </html>
+
+
+
+
