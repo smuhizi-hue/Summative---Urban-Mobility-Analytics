@@ -4,3 +4,4 @@ pyarrow
 pyproj
 pymysql
 cryptography
+python-dotenv
