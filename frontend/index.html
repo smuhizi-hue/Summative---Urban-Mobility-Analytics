@@ -9,7 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 <title> NYC Urban Mobility Exlorer</title>
 
-<link rel="stylesheet" href="vendor/leaflet.css">
+<link
+ rel="stylesheet" 
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -21,11 +24,13 @@
 <header>
  <div>
 <h1>  NYC Urban Mobility Explorer</h1>  
-<p>HOw does NEW YORK City mive? Yellow taxi trips, January 2019<p>
+<p>HOw does NEW YORK City move? Yellow taxi trips, January 2019<p>
 </div>
 
 
-<divn class="story-card" onclick="applystory('rush')">
+<div class="story-card" onclick="applyStory('rush')">
+
+</div>
 <h3>1 . Two different cities</h3>
 <p>
     On weekdays the peak id the evening rush (6 pm).
@@ -75,7 +80,7 @@
     vendor
     <select id="f-vendor">
         <option value="">All vendors</option>
-        </select>
+    </select>
 </label>
     Day type
     <select id="f-daytype">
@@ -87,7 +92,7 @@
 
 </label>
    Hour from (0-23)
-   <input type="number" id="f-hour-from" min="0" max="23" placeholder="0"> 
+   <input type="number" id="f-hour-from" min="0" max="23"> 
 </label>
 
 </label>
@@ -312,9 +317,9 @@ Hour to (0-23)
                                                             . Built with Flask, MYSQL, Chart.js and Leaflet
                                                             </footer>
 
-                                                            <script src="vendor/chart.umd.js"></script>
-                                                            <script src="vendor/leaflet.js"></script>
-                                                            <script src="js/main.js"></script>
+                                                            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"></script>
+                                                            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                                                            <script src="/main.js"></script>
                                                         </body>
                                                         </html>
 
