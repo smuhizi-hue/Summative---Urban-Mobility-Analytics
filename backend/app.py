@@ -150,7 +150,7 @@ def zones_shapes():
 def routes_top():
     """The most common pickup -> droff pairs."""
     where, params = build_where(request.args)
-    how_many = min(int(request.agrs.get("n", 10)), 50)
+    how_many = min(int(request.args.get("n", 10)), 50)
 #step 1 inner query
 #step 2 outer query
     sql = f"""SELECT zp.zone_name AS pickup_zone, zd.zone_name AS dropoff_zone, t.trips
@@ -230,4 +230,4 @@ def warm_up_cache():
 if __name__ == "__main__":
     threading.Thread(target=warm_up_cache, daemon=True).start()
     app.run(debug=False, threaded=True)
->>>>>>> af88c2b (work done)
+
