@@ -10,14 +10,14 @@
 <title> NYC Urban Mobility Exlorer</title>
 
 <link rel="stylesheet" href="vendor/leaflet.css">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="style.css">
 </head>
 
 
 <body>
 
 
-    <! -- ==== Header ==== -->
+    <!-- ==== Header ====-->
 <header>
  <div>
 <h1>  NYC Urban Mobility Explorer</h1>  
@@ -25,7 +25,7 @@
 </div>
 
 
-<divn id="story-card" onclick="applystory('rush')">
+<divn class="story-card" onclick="applystory('rush')">
 <h3>1 . Two different cities</h3>
 <p>
     On weekdays the peak id the evening rush (6 pm).
@@ -35,7 +35,7 @@
 </div>
 
 
-</div class="story-card" onclick="applystory"('airport')>
+</div class="story-card" onclick="applystory"(' airport')>
 <h3>3 . Airport trips are gold</h3>
 <p>
     Only <b>6.4%</b> of trips go to or from an airport,
@@ -54,7 +54,7 @@
 
     <label>
       From date 
-      <input type="date" id=" f-start">
+      <input type="date" id="f-start">
    </label>
 
 <label>
@@ -67,16 +67,21 @@
     <label>
         Payment
      <select id="f-payment">
-        <option value="">All</option>
+        <option value="">All payments</option>
     </select>
 </label>
-
+   
+   <label>
+    vendor
+    <select id="f-vendor">
+        <option value="">All vendors</option>
+        </select>
 </label>
     Day type
     <select id="f-daytype">
         <option value="">All days</option>
-        <option value="">weekdays</option>
-        <option value="">weekends</option>
+        <option value="weekday">weekdays</option>
+        <option value="weekend">weekends</option>
     </select>
 </label>
 
@@ -273,7 +278,7 @@ Hour to (0-23)
                                                                 <th>From</th>
                                                                 <th>To</th>
                                                                 <th data-sort="trip-distance">Distance (mi)</th>
-                                                                <th data-sort="trip_duration_min"></th>Minutes</th>
+                                                                <th data-sort="trip_duration_min">Minutes</th>
                                                                 <th data-sort="avg_speed_mph">Speed (mph)</th>
                                                                 <th data-sort="fare_amount">Fare</th>
                                                                 <th data-sort="tip_amount">Tip</th>

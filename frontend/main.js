@@ -23,6 +23,7 @@ function number(value) {
 
 function money(value) {
     if (value === null || value === undefined) return "-"; 
+    return "$" + Number(value).toFixed(2);
 }
 
 function formatMetric(metric, value) {
@@ -39,7 +40,7 @@ function byID(id) {
 }
 
 async function getJson(url) {
-  const response = awaitfetch(url);
+  const response = await fetch(url);
   if (!response.ok) throw new Error ("The server answered with an error for "+ url);
   return await response.json();    
 }
@@ -51,9 +52,9 @@ function getFilters() {
 //input id name the api expects
 const fields = [
     ["f-start", "start_date"], ["f-end", "end_date"], ["f-borough", "borough",]
-    ["f-payment", "payment_type"], ["f-daytype", "day_type"],
+    ["f-payment", "payment_type"], ["f-vendor", "vendor_id"], ["f-daytype", "day_type"],
     ["f-hour-from", "hour_from"], ["f-hour-to", "hour_to"],
-    [ "f-min-distance", "min_distance"], ["f-max-distance, "max_distance"],
+    [ "f-min-distance", "min_distance"], ["f-max-distance", "max_distance"]
     ["f-min-fare", "min-fare"], ["f-max-fare", "max_fare"],
 ];
 for(const field of fields) {
@@ -99,6 +100,12 @@ async function loadOptions() {
     for (const id of ["f-start", "f-end"]) {
         byID(id).min = options.first_day;
         byID(id).max = options.last_day;
+
+    for (const vendor of options.vendors){
+        byID("f-vendor").add(
+          new Option(vendor.vendor_name, vendor.vendor_id)
+        );
+    }
     }
 }
 
@@ -188,13 +195,13 @@ async function loadHourly(query) {
 
 async function loadDaily (query) {
     const rows  = await getJson("/api/daily?" + query);
-    charts.daily.data.labels = rows.map((r) = r.day.slice(5));
-    charts.daily.data.datasets[0].data =rows.map((r) = r.trips);
+    charts.daily.data.labels = rows.map((r) => r.day.slice(5));
+    charts.daily.data.datasets[0].data =rows.map((r) => r.trips);
     charts.daily.update();
 }
 
 async function loadpayments (query) {
-    const rows = await getJson("/api/payments? + query);
+    const rows = await getJson("/api/payments?" + query);
     charts.payment.data.labels = rows.map((r) = r.trips);
     charts.payment.data.datasets[0].data = rows.map((r) = r.trips);
     charts.payments.update();
