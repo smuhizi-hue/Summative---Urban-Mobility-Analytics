@@ -4,7 +4,7 @@ import threading
 from flask import Flask, jsonify, request, send_from_directory
 
 import config
-from  db run_query
+from  db import run_query
 from filters import build_where
 from algorithms import top_zones
 from config import TIP_PERCENT_SQL
