@@ -4,9 +4,9 @@ import threading
 from flask import Flask, jsonify, request, send_from_directory
 
 import config
-from bd import run_query
+from  db run_query
 from filters import build_where
-from alogorithms import top_zones
+from algorithms import top_zones
 from config import TIP_PERCENT_SQL
 
 FRONTEND_FOLDER = os.path.join(config.BASE_DIR, "frontend")
