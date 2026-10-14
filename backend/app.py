@@ -10,7 +10,7 @@ from alogorithms import top_zones
 from config import TIP_PERCENT_SQL
 
 FRONTEND_FOLDER = os.path.join(config.BASE_DIR, "frontend")
-app = Flask(__name__, static__folder=FRONTEND_FOLDER, static_url_path="")
+app = Flask(__name__, static_folder=FRONTEND_FOLDER, static_url_path="")
 cache ={}
 zone_cache ={}
 
@@ -36,13 +36,16 @@ def home():
 @app.route("/api/options")
 @cached
 def options():
+    venders = run_query(
+        "SELECT vendor_id, vendor_name FROM vendors ORDER BY vendor_name"
+    )
     boroughs = run_query("SELECT borough_name FROM boroughs"
                         "WHERE borough_name <> 'Unknown' ORDER BY borough_name")
     payment  = run_query("SELECT payment_type_id, payment_type_name FROM payment_types "
                         "WHERE payment_type_id IN (1, 2, 3, 4)")
     dates = run_query("SELECT MIN(pickup_date) AS first_day, MAX(pickup_date) AS last_day FROM trips")
     return jsonify({ "boroughs":[b["borough_name"] for b in boroughs],
-                    "payment_types": payments,
+                    "payment_types": payment,
                     "first_day": dates[0]["first_day"],                     
                     "last_day": dates[0]["last_day"]})
 
@@ -72,8 +75,9 @@ def hourly():
               FROM trips {where}
               GROUP BY pickup_hour, is_weekend 
               ORDER BY pickup_hour"""
-    return jsonify(run_query(sql, params))                
-
+    return jsonify(run_query(sql, params))  
+    
+@app.route("/api/daily")
 @cached
 def daily():
     where, params = build_where(request.args)
@@ -86,12 +90,11 @@ def daily():
 @cached
 def payments():
     where, params = build_where(request.args)
-    sql = f"""SELECT p.payment_name AS name, COUN(*) AS  trips
+    sql = f"""SELECT p.payment_name AS name, COUNT(*) AS  trips
               FROM trips JOIN payment_types p ON trips.payment_type_id = p.payment_type_id
               {where}
               GROUP BY p.payment_type_name ORDER BY trips DESC"""
     return jsonify(run_query(sql, params))
-
 
 #zones and route
 def get_zone_stats(args):
@@ -145,9 +148,6 @@ def zones_shapes():
 @app.route("/api/routes/top")
 @cached
 def routes_top():
-<<<<<<< HEAD
-    """The most common pickup
-=======
     """The most common pickup -> droff pairs."""
     where, params = build_where(request.args)
     how_many = min(int(request.agrs.get("n", 10)), 50)
@@ -164,7 +164,7 @@ def routes_top():
     return  jsonify(run_query(sql, params))
 
 #detail the table
-@app.route("api/trips")
+@app.route("/api/trips")
 @cached 
 def trips_list():
     """ A page of individual trips, with sorting."""
