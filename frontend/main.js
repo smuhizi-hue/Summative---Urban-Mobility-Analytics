@@ -36,7 +36,7 @@ function formatMetric(metric, value) {
 }
 
 function byID(id) {
-    return documents.getElementbyID(id);
+    return documents.getElementbyID("map");
 }
 
 async function getJson(url) {
