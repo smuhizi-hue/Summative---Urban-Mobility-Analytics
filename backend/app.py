@@ -8,6 +8,7 @@ from bd import run_query
 from filters import run_query
 from filters import build_where
 from alogorithms import top_zones
+from config import TIP_PERCENT_SQL
 
 FRONTEND_FOLDER = os.path.join(config.BASE_DIR, "frontend")
 app = Flask(__name__, static__folder=FRONTEND_FOLDER, static_url_path="")
