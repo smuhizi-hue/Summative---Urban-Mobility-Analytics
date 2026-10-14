@@ -60,36 +60,44 @@ def fill_lookup_tables(connection):
     print("Lookup tables filled.")
 
 def insert_trips(connection):
-    parquet_file = pq.ParquetFile(config.CLEAN_TRIPS_FILE)
-    total = parquet_file.metadata.numrows
+    parquet_file =pq.ParquetFile(config.CLEAN_TRIPS_FILE)
+    total = parquet_file.metadata.num_rows
 
-    sql = "INSERT INTO trips ("+ ",".join(TRIP_COLUMNS) + ") VALUES (" + ", ".join(["%s"] * len(TRIP_COLUMNS)) + ")"
+    sql = (
+        "INSERT INTO trips(" + ",".join(TRIP_COLUMNS) +") VALUES (" + ", ".join(["%s"] * len(TRIP_COLUMNS)) + ") ON DUPLICATE KEY UPDATE trip_id=trips.trip_id"
+    )
+
     cursor = connection.cursor()
-    cursor.execute("SET FOREIGN_KEY_CHECKS=0") # the data is already checked, so this is faster
-    cursor.execute("SET UNIQUE_CHEKS = 0")
-
     done = 0
-    for piece in parquet_file.iter_batches(batch_size=BATCH_Size):
-        batch = piece.to_pandas()
-        batch = batch.rename(columns={"payment_type": "payment_type_id"})
 
-        batch["pickup_date"] = batch["pickup_time"].dt.strfime("%Y-%m-%d")
+    try:
+        for piece in parquet_file.iter_batches(batch_size=BATCH_Size):
+            batch = piece.to_pandas()
+            batch = batch.rename(columns={"payment_type": "payment_type_id"})
 
-        batch = batch[TRIP_COLUMNS].copy()
+            batch["pickup_date"] = batch["pickup_time"].dt.strftime("%Y-%m-%d")
+            batch = batch[TRIP_COLUMNS].copy()
 
-        batch["pickup_time"] = batch["pickuptime"].dt.strftime("%Y-%m-%d %H:%M:%wS")
-        batch["dropoff_time"] = batch["dropoff_time"].dt.strftime("%Y-%m-%d %H:%M:%S")
-        for column in ["is_weekend", "is_cross_borough", "is_airport_trip", "is_suspicious"]:
-            batch[column] = batch[column].astype(int)
+            batch["pickup_time"] = batch["pickup_time"].dt.strftime("%Y-%m-%d %H:%M:%S")
+            batch["dropoff_time"] = batch["dropoff_time"].dt.strftime("%Y-%m-%d %H:%M:%S")
 
-        batch = batch.asytype(object).where(batch.notna(),None)
+            for column in ["is_weekend", "is_cross_borough", "is_airport_trip","is_suspicious"]:
+                batch[column] = batch[column].astype(int)
 
-        cursor.executemany(sql, batch.values.tolist())
-        connection.commit()
-        done= done + len(batch)
-        print(f"   inserted {done:,} / {total:,} trips", flush=True)
+            batch = batch.astype(object).where(batch.notna(), None)
+            cursor.executemany(sql, batch.values.tolist())
+            connection.commit()
 
-    cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+            done += len(batch)
+            print(f"Processed {done:,} / {total:,} trips", flush=True)
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        cursor.close()
+
+
+
 def save_cleaning_log(connection):
     with open(config.SUMMARY_FILE) as file:
         summary = json.load(file)
@@ -102,25 +110,22 @@ def save_cleaning_log(connection):
 
 def main():
 
-    connection = pymysql.connect(host=config.DB_HOST, port=config.DB_PORT, user=config.DB_USER, password=config.DB_PASSWORD, charset="utf8mb4", local_infile=False)
-    print("1/5 Creating tables . . .")
-    run_sql_file(connection, config.SCHEMA_FILE)
-    connection.select_db(config.DB_NAME)
+    connection = pymysql.connect(
+        host=config.DB_HOST, 
+        port=config.DB_PORT, 
+        user=config.DB_USER, 
+        password=config.DB_PASSWORD, 
+        database=config.DB_NAME
+        )
 
-    print("2/5 Filling lookup tables . . .")
-    fill_lookup_tables(connection)
+    try:
+        print("Loading the complete trip data set...")
+        insert_trips(connection)
+        print("Trip loading finished succefully")
 
-    print("3/5 Inserting trips (this takes a while) . . .")
-    insert_trips(connection)
-
-    print("4/5 Creating indexes (also takes a while) . . .")
-    run_sql_file(connection, config.INDEXES_FILES)
-
-    print("5/5 Saving the cleaning log. . .")
-    save_cleaning_log(connection)
-
-    connection.close
-    print("Done! The database is ready. ")
+    finally:
+        connection.close()
+    
 
 
 if __name__ == "__main__":

@@ -49,7 +49,7 @@ CREATE TABLE trips (
     dropoff_zone_id      SMALLINT UNSIGNED NOT NULL,
     rate_code_id         TINYINT UNSIGNED NOT NULL,
     payment_type_id      TINYINT UNSIGNED NOT NULL,
-    passenger_type_id    TINYINT UNSIGNED NOT NULL,
+    passenger_count      TINYINT UNSIGNED NOT NULL,
     trip_distance        DECIMAL(6,2) NOT NULL,
     store_and_fwd_flag   CHAR(1) NOT NULL,
 
@@ -68,7 +68,7 @@ CREATE TABLE trips (
 trip_duration_min        DECIMAL(6,2) NOT NULL, 
 avg_speed_mph            DECIMAL(5,2) NOT NULL,
 fare_per_mile            DECIMAL(7,2) NOT NULL,
-tip_percent              DECIMAL(8,2) NOT NULL,
+tip_percent              DECIMAL(8,2) NULL,
 pickup_date              DATE NOT NULL,
 pickup_hour              TINYINT UNSIGNED NOT NULL,
 pickup_day_of_week       TINYINT UNSIGNED NOT NULL,

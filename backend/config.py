@@ -1,6 +1,8 @@
 import os
+from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # this is the main project folder
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # Defining paths
 RAW_TRIPS_FILE = os.path.join(BASE_DIR, "data", "raw","yellow_tripdata_2019-01.parquet")
@@ -57,8 +59,8 @@ VENDORS = {
 
 DB_HOST = os.environ.get("DB_HOST", "localhost")
 DB_PORT = int(os.environ.get("DB_PORT", "3306"))
-DB_USER = "mobility_user"
-DB_PASSWORD = "TaxiTest2026!"
+DB_USER = os.environ.get("DB_USER", "mobility_user")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
 DB_NAME = os.environ.get("DB_NAME", "nyc_taxi")
-SCHEMA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "database", "schema.sql")
-INDEXES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "database", "indexes.sql")
+SCHEMA_FILE = os.path.join(BASE_DIR, "database", "schema.sql")
+INDEXES_FILE = os.path.join(BASE_DIR, "database", "indexes.sql")

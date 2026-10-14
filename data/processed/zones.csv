@@ -263,4 +263,4 @@ zone_id,borough,zone_name,service_zone,center_lat,center_lon,has_boundary
 262,Manhattan,Yorkville East,Yellow Zone,40.777583,-73.945303,True
 263,Manhattan,Yorkville West,Yellow Zone,40.779006,-73.950209,True
 264,Unknown,Unknown,Unknown,,,False
-265,Unkown,Outside of NYC,Unknown,,,False
+265,Unknown,Outside of NYC,Unknown,,,False

@@ -10,7 +10,7 @@ def load_lookup():
     lookup.columns = ["zone_id", "borough", "zone_name","service_zone"]
 
     #zones blank, filling them with Unknown
-    lookup["borough"] = lookup["borough"].fillna("Unkown")
+    lookup["borough"] = lookup["borough"].fillna("Unknown")
     lookup["zone_name"] = lookup["zone_name"].fillna("Unknown")
     lookup["service_zone"] = lookup["service_zone"].fillna("Unknown")
 
