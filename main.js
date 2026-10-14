@@ -1,6 +1,7 @@
 let selectedZone = null;
 let currentPage = 1;
-let sortorder = "desc";
+let sortBy = "pickup_time";
+let sortOrder = "desc";
 
 const charts = {};
 let map = null;
@@ -36,7 +37,8 @@ function formatMetric(metric, value) {
 }
 
 function byID(id) {
-    return documents.getElementbyID("map");
+    return byID(id);
+    return documents.getElementbyID("id");
 }
 
 async function getJson(url) {
@@ -61,7 +63,7 @@ for(const field of fields) {
     const value = byID(field[0]).value;
     if (value !=="") params.set(field[1], value);
 }
-if (byID("f-aiport").checked) params.set("airport_only", "1");
+if (byID("f-airport").checked){ params.set("airport_only", "1");}
 if (byID("f-suspicious").checked) params.set ("hide_suspicious", "1");
 if (selectedZone !== null) params.set("zone_id", selectedZone.id);
 return params
@@ -78,7 +80,7 @@ function resetFilters() {
 
 function selectZone(id, name)  {
     selectedZone = { id: id, name: name};
-    const chip = byID("Zone-chip");
+    const chip = byID("zone-chip");
     chip.textContent = "Zone: " + name + " ";
     chip.classList.remove("hidden");
     loadEverything();
@@ -112,9 +114,12 @@ async function loadOptions() {
 //charts
 function makecharts() {
     charts.defaults.font.family = "system-ui, sans-serif";
+
     const hours = [];
-    for(let h = 0; h < 24; h++) hours.push(h + ":00");
-    const lineoptions = (yTitle) = ({
+    for(let h = 0; h < 24; h++) 
+      hours.push(h + ":00");
+  }
+    const lineoptions = (yTitle) => ({
         responsive: true,
         maintainAspectRatio: false,
         interaction: { mode: "index", intersect: false },
@@ -123,8 +128,8 @@ function makecharts() {
     charts.hourly = new chart(byID("chart-hourly"), {
         type: "line",
         data: { labels: hours, datasets: [
-            {label: "weekdays", data [], bordercolor: "#2563eb", backgroundcolor: "#2563eb", tension: 0.3},
-            {label: "weekends", data [], bordercolor: "#f59e0b", backgroundcolor: "#f59e0b", tension: 0.3},
+            { label: "weekdays", data: [], bordercolor: "#2563eb", backgroundcolor: "#2563eb", tension: 0.3},
+            { label: "weekends", data: [], bordercolor: "#f59e0b", backgroundcolor: "#f59e0b", tension: 0.3},
         ]}
         options: lineoptions("% of trips"),
 
@@ -133,7 +138,7 @@ function makecharts() {
         type: "line",
         data: { labels: hours, datasets: [
             {label: "weekdays", data: [], bordercolor: "#2563eb", backgroundcolor: "#2563eb", tension: 0.3},
-            {label: "weekends", data: [], bordercolor: "#f59e0b", backgroundcolor: "#f59e0b"; tension: 0.3},
+            {label: "weekends", data: [], bordercolor: "#f59e0b", backgroundcolor: "#f59e0b", tension: 0.3},
 
 
     ]}
@@ -154,11 +159,11 @@ function makecharts() {
 
     charts.quality = new chart(byID(chart-quality), {
         type: "bar",
-        data: { labels: [], datasets: [ { label: "Rows removed, data: [], backgroundcolor: "#ef4444"}] ],
+        data: { labels: [], datasets: [ { label: "Rows removed, data: [], backgroundcolor: "#ef4444"}]},
         options: { indexAxis: "y", responsive: true, maintainAspectRatio: false, Plugins: { legend: {display: false} } },
 
-    });
-}
+     });
+  }
 
 //loaders
 async function loadkpis(query) {
@@ -200,17 +205,17 @@ async function loadDaily (query) {
     charts.daily.update();
 }
 
-async function loadpayments (query) {
+async function loadpayments(query) {
     const rows = await getJson("/api/payments?" + query);
-    charts.payment.data.labels = rows.map((r) = r.trips);
-    charts.payment.data.datasets[0].data = rows.map((r) = r.trips);
+    charts.payment.data.labels = rows.map((r) => r.trips);
+    charts.payment.data.datasets[0].data = rows.map((r) => r.trips);
     charts.payments.update();
 }
 
 async function loadRoutes(query) {
     const rows = await getJson("/api/routes/top?n=10&" + query);
     let html = "";
-    rows.array.forEach((r,i) => {
+    rows.forEach((r,i) => {
         html +=  `<tr><td>${i + 1}</td><td>${r.pickup_zone}</td><td>${r.dropoff_zone}</td>
              <td>${number(r.trips)}</td></tr>`;
      });
