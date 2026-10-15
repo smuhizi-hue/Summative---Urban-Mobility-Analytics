@@ -1,0 +1,14 @@
+Project Objective: Build a full-stack urban mobility analytics platform using NYC Taxi data, featuring a cleaned relational database, a Flask backend API, and an interactive frontend dashboard.
+
+Core Architecture:
+
+·       Database (database/): Normalized relational tables (trips, zones, boroughs, payment types) with optimized indexing.
+
+·       Backend (backend/): Handles data cleaning, feature engineering, API endpoints, and a custom-built ranking algorithm (algorithms.py).
+
+Frontend (frontend/): A responsive web dashboard with filters, metrics, and data visualizations.
+Key Requirements & Deliverables: Include code files, a technical report PDF in docs/, individual CodeVibe-reports/, a root README.md, and a 3-minute video walkthrough.
+
+ Getting Started: Clone the repo, run the database seeding script, launch backend/app.py, and open http://localhost:5000 in your browser.
+
+ 
