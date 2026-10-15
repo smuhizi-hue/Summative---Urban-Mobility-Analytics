@@ -30,9 +30,10 @@ def build_where(args):
 
     # where
     if args.get("borough"):
-        conditions.append("trips.pickup_zone_id IN (SELECT z.zone_id FROM zones z" 
-                         "JOIN boroughs b ON z.borough_id = b.borough_id" 
-                         "WHERE b.borough_name = %s")
+        conditions.append(
+            "trips.pickup_zone_id IN (SELECT z.zone_id FROM zones z" 
+            "JOIN boroughs b ON z.borough_id = b.borough_id" 
+            "WHERE b.borough_name = %s")
         params.append(args["borough"])
 
     if args.get("zone_id"):
@@ -68,4 +69,4 @@ def build_where(args):
 
     if len(conditions)  == 0:
         return "", []
-    return "WHERE" + "AND".join(conditions), params
+    return " WHERE " + " AND ".join(conditions), params

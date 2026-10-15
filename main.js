@@ -37,8 +37,7 @@ function formatMetric(metric, value) {
 }
 
 function byID(id) {
-    return byID(id);
-    return documents.getElementbyID("id");
+    return document.getElementById(id);
 }
 
 async function getJson(url) {
@@ -53,11 +52,18 @@ function getFilters() {
 
 //input id name the api expects
 const fields = [
-    ["f-start", "start_date"], ["f-end", "end_date"], ["f-borough", "borough",]
-    ["f-payment", "payment_type"], ["f-vendor", "vendor_id"], ["f-daytype", "day_type"],
-    ["f-hour-from", "hour_from"], ["f-hour-to", "hour_to"],
-    [ "f-min-distance", "min_distance"], ["f-max-distance", "max_distance"]
-    ["f-min-fare", "min-fare"], ["f-max-fare", "max_fare"],
+    ["f-start", "start_date"], 
+    ["f-end", "end_date"], 
+    ["f-borough", "borough",],
+    ["f-payment", "payment_type"], 
+    ["f-vendor", "vendor_id"], 
+    ["f-daytype", "day_type"],
+    ["f-hour-from", "hour_from"], 
+    ["f-hour-to", "hour_to"],
+    [ "f-min-distance", "min_distance"], 
+    ["f-max-distance", "max_distance"],
+    ["f-min-fare", "min_fare"], 
+    ["f-max-fare", "max_fare"],
 ];
 for(const field of fields) {
     const value = byID(field[0]).value;
@@ -112,67 +118,84 @@ async function loadOptions() {
 }
 
 //charts
-function makecharts() {
-    charts.defaults.font.family = "system-ui, sans-serif";
+function makeCharts() {
+    Chart.defaults.font.family = "system-ui, sans-serif";
 
     const hours = [];
     for(let h = 0; h < 24; h++) 
       hours.push(h + ":00");
-  }
-    const lineoptions = (yTitle) => ({
+  
+    const lineOptions = (yTitle) => ({
         responsive: true,
         maintainAspectRatio: false,
         interaction: { mode: "index", intersect: false },
-        scales: { y: { title: {display: true, text: yTitle}, beginAtZero: true} },
+        scales: { 
+          y: {
+             title: {display: true, text: yTitle},
+             beginAtZero: true} },
     });
-    charts.hourly = new chart(byID("chart-hourly"), {
+    charts.hourly = new Chart(byID("chart-hourly"), {
         type: "line",
-        data: { labels: hours, datasets: [
-            { label: "weekdays", data: [], bordercolor: "#2563eb", backgroundcolor: "#2563eb", tension: 0.3},
-            { label: "weekends", data: [], bordercolor: "#f59e0b", backgroundcolor: "#f59e0b", tension: 0.3},
-        ]}
-        options: lineoptions("% of trips"),
+        data: {
+           labels: hours,
+           datasets: [
+            { label: "weekdays", data: [], borderColor: "#2563eb", backgroundColor: "#2563eb", tension: 0.3},
+            { label: "weekends", data: [], borderColor: "#f59e0b", backgroundColor: "#f59e0b", tension: 0.3},
+        ]},
+        options: lineOptions("% of trips")
 
-    })
-    charts.speed = new chart(byID("chart-speed"), {
+    });
+    charts.speed = new Chart(byID("chart-speed"), {
         type: "line",
-        data: { labels: hours, datasets: [
+        data: { 
+          labels: hours, 
+          datasets: [
             {label: "weekdays", data: [], bordercolor: "#2563eb", backgroundcolor: "#2563eb", tension: 0.3},
-            {label: "weekends", data: [], bordercolor: "#f59e0b", backgroundcolor: "#f59e0b", tension: 0.3},
+            {label: "weekends", data: [], bordercolor: "#f59e0b", backgroundcolor: "#f59e0b", tension: 0.3}
 
 
-    ]}
-    options: lineoptions("mph"),
+    ]},
+    options: lineOptions("mph"),
     });
 
-    charts.daily = new chart(byID("chart-daily"), {
+    charts.daily = new Chart(byID("chart-daily"), {
         type: "bar",
-        data: { labels: [], datasets: [{ label: "Trips", data [], backgroundcolor: "#ffc107"}] },
-        options: { responsive: true, maintainAspectRatio: false, Plugins:{ legend: { display: false} } },
+        data: { 
+          labels: [],
+          datasets: [{ label: "Trips", data: [], backgroundColor: "#ffc107"}] },
+        options: { responsive: true, maintainAspectRatio: false, plugins:{ legend: { display: false} } },
     });
 
-    charts.payment = new charts(byID("chart-payments"), {
+    charts.payment = new Chart(byID("chart-payments"), {
         type: "doughnut",
-        data: { labels: [], datasets: [{ data [], backgroundcolor: ["#2563eb", "#ffc107", "#10b981", "#ef4444"] }] },
+        data: { labels: [], datasets: [{ data: [], backgroundColor: ["#2563eb", "#ffc107", "#10b981", "#ef4444"] }] },
         options: { responsive: true , maintainAspectRatio: false },
     });
 
-    charts.quality = new chart(byID(chart-quality), {
+    charts.quality = new Chart(byID("chart-quality"), {
         type: "bar",
-        data: { labels: [], datasets: [ { label: "Rows removed, data: [], backgroundcolor: "#ef4444"}]},
-        options: { indexAxis: "y", responsive: true, maintainAspectRatio: false, Plugins: { legend: {display: false} } },
+        data: { 
+          labels: [],
+          datasets: [{ label: "Rows removed", data: [], backgroundColor: "#ef4444"}]},
+        options: { 
+          indexAxis: "y", 
+          responsive: true, 
+          maintainAspectRatio: false,
+          plugins: { legend: {display: false} } }
+         
+
 
      });
-  }
+    }
 
 //loaders
-async function loadkpis(query) {
+async function loadKpis(query) {
     const k = await getJson("/api/kpis?" + query);
     byID("kpi-trips").textContent = number(k.trips);
     byID("kpi-fare").textContent = money(k.avg_fare);
     byID("kpi-distance").textContent = k.avg_distance === null ? "-" : k.avg_distance + " mi";
     byID("kpi-minutes").textContent = k.avg_minutes === null ? "-" : k.avg_minutes + " min";
-    byID("kpi_speed").textContent = k.avg_speed === null ? "-" : k.avg_speed + "mph";
+    byID("kpi-speed").textContent = k.avg_speed === null ? "-" : k.avg_speed + "mph";
     byID("kpi-tip").textContent = k.tip_percent === null ? "-" : k.tip_percent + "%";
     byID("header-count").textContent = number(k.trips) + "trips selected";
 }
@@ -205,11 +228,11 @@ async function loadDaily (query) {
     charts.daily.update();
 }
 
-async function loadpayments(query) {
+async function loadPayments(query) {
     const rows = await getJson("/api/payments?" + query);
-    charts.payment.data.labels = rows.map((r) => r.trips);
+    charts.payment.data.labels = rows.map((r) => r.payment_type_name);
     charts.payment.data.datasets[0].data = rows.map((r) => r.trips);
-    charts.payments.update();
+    charts.payment.update();
 }
 
 async function loadRoutes(query) {
@@ -223,11 +246,11 @@ async function loadRoutes(query) {
 }
 
 async function loadTopZones(query) {
-  const metric = byId("metric").value;
+  const metric = byID("metric").value;
   const rows = await getJson("/api/zones/top?n=10&metric=" + metric + "&" + query);
 
   if (rows.length === 0) {
-    byId("top-zones").innerHTML = "<li>No zone has enough trips for these filters.</li>";
+    byID("top-zones").innerHTML = "<li>No zone has enough trips for these filters.</li>";
     return;
   }
   const biggest = rows[0][metric];
@@ -238,7 +261,7 @@ async function loadTopZones(query) {
              <div class="sub">${zone.borough} · ${formatMetric(metric, zone[metric])}</div>
              <div class="bar" style="width:${width}%"></div></li>`;
   }
-  byId("top-zones").innerHTML = html;
+  byID("top-zones").innerHTML = html;
 }
 
 async function loadTrips(query) {
@@ -255,15 +278,15 @@ async function loadTrips(query) {
   document.querySelector("#trips-table tbody").innerHTML = html;
 
   const lastPage = Math.max(1, Math.ceil(data.total / data.per_page));
-  byId("trips-total").textContent = "(" + number(data.total) + " trips match)";
-  byId("page-info").textContent = "Page " + data.page + " of " + number(lastPage);
-  byId("btn-prev").disabled = currentPage <= 1;
-  byId("btn-next").disabled = currentPage >= lastPage;
+  byID("trips-total").textContent = "(" + number(data.total) + " trips match)";
+  byID("page-info").textContent = "Page " + data.page + " of " + number(lastPage);
+  byID("btn-prev").disabled = currentPage <= 1;
+  byID("btn-next").disabled = currentPage >= lastPage;
 }
 
 async function loadQuality() {
   const report = await getJson("/api/cleaning-report");
-  byId("quality-text").textContent =
+  byID("quality-text").textContent =
     number(report.rows_removed) + " raw records were removed and " + number(report.rows_kept) +
     " were kept (" + report.percent_kept + "%). " + number(report.suspicious_kept) +
     " kept records are marked as suspicious (their total does not match the sum of their parts).";
@@ -304,7 +327,7 @@ const palette = ["#fff7bc", "#fec44f", "#fe9929", "#d95f0e", "#993404"];
 let scale = { min: 0, max: 1 };
 
 function zoneStyle(feature) {
-  const metric = byId("metric").value;
+  const metric = byID("metric").value;
   const s = zoneStats[feature.properties.zone_id];
   let color = "#e2e8f0";                                  // grey = no / too little data
   if (s && s.pickups >= tooLittleData && s[metric] !== null) {
@@ -324,7 +347,7 @@ async function loadMap(query) {
 }
 
 function updateMapColors() {
-  const metric = byId("metric").value;
+  const metric = byID("metric").value;
 
   // find the smallest and biggest value among zones with enough trips
   let min = Infinity;
@@ -339,14 +362,14 @@ function updateMapColors() {
   scale = { min: min, max: max };
   if (zoneLayer) zoneLayer.setStyle(zoneStyle);
 
-  byId("legend").textContent = max === -Infinity ? "No data for these filters." :
+  byID("legend").textContent = max === -Infinity ? "No data for these filters." :
     "Light = low (" + formatMetric(metric, min) + ")  →  dark = high (" + formatMetric(metric, max) +
     "). Grey = fewer than " + tooLittleData + " pickups.";
 }
 
 // ============================================================ put it all together
 async function loadEverything() {
-  byId("loading").classList.remove("hidden");
+  byID("loading").classList.remove("hidden");
   currentPage = 1;
   const query = getFilters().toString();
   try {
@@ -357,7 +380,7 @@ async function loadEverything() {
   } catch (error) {
     alert("Sorry, something went wrong: " + error.message);
   }
-  byId("loading").classList.add("hidden");
+  byID("loading").classList.add("hidden");
 }
 
 // the three story cards at the top
@@ -366,11 +389,11 @@ function applyStory(which) {
   let target = "chart-hourly";
   if (which === "speed") target = "chart-speed";
   if (which === "airport") {
-    byId("f-airport").checked = true;
+    byID("f-airport").checked = true;
     target = "kpi-fare";
   }
   loadEverything();
-  byId(target).scrollIntoView({ behavior: "smooth", block: "center" });
+  byID(target).scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 // ============================================================ start
@@ -381,23 +404,23 @@ async function start() {
   try {
     await loadOptions();           // fills the drop-downs (needs the database)
   } catch (error) {
-    byId("header-count").textContent = "Database not reachable - is MySQL running?";
+    byID("header-count").textContent = "Database not reachable - is MySQL running?";
   }
 
   loadQuality().catch(function () {});   // if the database is down, just skip this chart
   loadEverything();
 
-  byId("btn-apply").onclick = loadEverything;
-  byId("btn-reset").onclick = function () { resetFilters(); loadEverything(); };
-  byId("zone-chip").onclick = function () { clearZone(); loadEverything(); };
+  byID("btn-apply").onclick = loadEverything;
+  byID("btn-reset").onclick = function () { resetFilters(); loadEverything(); };
+  byID("zone-chip").onclick = function () { clearZone(); loadEverything(); };
 
-  byId("metric").onchange = function () {
+  byID("metric").onchange = function () {
     updateMapColors();
     loadTopZones(getFilters().toString());
   };
 
-  byId("btn-prev").onclick = function () { currentPage--; loadTrips(getFilters().toString()); };
-  byId("btn-next").onclick = function () { currentPage++; loadTrips(getFilters().toString()); };
+  byID("btn-prev").onclick = function () { currentPage--; loadTrips(getFilters().toString()); };
+  byID("btn-next").onclick = function () { currentPage++; loadTrips(getFilters().toString()); };
 
   // click a column title to sort the trip table
   for (const th of document.querySelectorAll("#trips-table th[data-sort]")) {

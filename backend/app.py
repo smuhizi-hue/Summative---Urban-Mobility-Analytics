@@ -7,9 +7,8 @@ import config
 from  db import run_query
 from filters import build_where
 from algorithms import top_zones
-from config import TIP_PERCENT_SQL
 
-FRONTEND_FOLDER = os.path.join(config.BASE_DIR, "frontend")
+FRONTEND_FOLDER = config.BASE_DIR
 app = Flask(__name__, static_folder=FRONTEND_FOLDER, static_url_path="")
 cache ={}
 zone_cache ={}
@@ -26,7 +25,7 @@ def cached(function):
     return wrapper
 
     #Using total tips.
-    TIP_PERCENT_SQL = "ROUND(100.0 * SUM(tip_amount) / NULLIF(SUM(fare_amount), 0), 1)"
+TIP_PERCENT_SQL = "ROUND(100.0 * SUM(tip_amount) / NULLIF(SUM(fare_amount), 0), 1)"
 
 #page
 @app.route("/")
@@ -39,8 +38,10 @@ def options():
     venders = run_query(
         "SELECT vendor_id, vendor_name FROM vendors ORDER BY vendor_name"
     )
-    boroughs = run_query("SELECT borough_name FROM boroughs"
-                        "WHERE borough_name <> 'Unknown' ORDER BY borough_name")
+    boroughs = run_query(
+        "SELECT borough_name FROM boroughs "
+        "WHERE borough_name <> 'Unknown' ORDER BY borough_name"
+        )
     payment  = run_query("SELECT payment_type_id, payment_type_name FROM payment_types "
                         "WHERE payment_type_id IN (1, 2, 3, 4)")
     dates = run_query("SELECT MIN(pickup_date) AS first_day, MAX(pickup_date) AS last_day FROM trips")
@@ -81,7 +82,7 @@ def hourly():
 @cached
 def daily():
     where, params = build_where(request.args)
-    sql = f"""SELECT pick_data AS day, COUNT(*) AS trips, ROUND(AVG(fare_amount), 2) AS avg_fare
+    sql = f"""SELECT pickup_date AS day, COUNT(*) AS trips, ROUND(AVG(fare_amount), 2) AS avg_fare
               FROM trips {where}
               GROUP BY pickup_date ORDER BY pickup_date"""
     return jsonify(run_query(sql, params))
@@ -90,7 +91,7 @@ def daily():
 @cached
 def payments():
     where, params = build_where(request.args)
-    sql = f"""SELECT p.payment_name AS name, COUNT(*) AS  trips
+    sql = f"""SELECT p.payment_type_name AS name, COUNT(*) AS  trips
               FROM trips JOIN payment_types p ON trips.payment_type_id = p.payment_type_id
               {where}
               GROUP BY p.payment_type_name ORDER BY trips DESC"""
@@ -136,7 +137,7 @@ def zones_top():
     if metric not in allowed:
         return jsonify({"error": "unknown metric"}), 400
 
-    how_many = int(request.orgs.get("n", 10))
+    how_many = int(request.args.get("n", 10))
     stats = get_zone_stats(request.args)
     return jsonify(top_zones(stats, metric, how_many, 200))
 
