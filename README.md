@@ -36,3 +36,4 @@ python backend/app.py
 Open a second terminal in the project root and run:
 
     python3 -m http.server 5500
+https://docs.google.com/spreadsheets/d/1lYUoX1MxxuThjcXsZbpu_VWGurPzR74pRQHddQSTaVk/edit?usp=sharing
