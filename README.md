@@ -41,3 +41,4 @@ Worksheet https://docs.google.com/spreadsheets/d/1lYUoX1MxxuThjcXsZbpu_VWGurPzR7
  groupmeeting https://drive.google.com/file/d/1Aaf0rRbw99r4TJ4gE63ygRqghspRJ9nz/view?usp=drivesdk
 
 Database design diagram https://drive.google.com/file/d/1zIuUMrSekpdFZHwRvIcaA9FjsxMptOQX/view?usp=sharing
+deployment https://summative-urban-mobility-analytics.onrender.com/
